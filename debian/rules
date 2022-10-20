@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+
+# activate all hardening flags
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+include /usr/share/dpkg/buildflags.mk
+
+# define DEB_HOST_GNU_TYPE also when calling debian/rules manually
+include /usr/share/dpkg/architecture.mk
+
+# use correct cross-compiler by default
+CC ?= $(DEB_HOST_GNU_TYPE)-gcc
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	dh_auto_build -- CC=$(CC) CFLAGS="$(CFLAGS) $(LDFLAGS) $(CPPFLAGS)"
+	docbook-to-man debian/zerofree.sgml > zerofree.8
